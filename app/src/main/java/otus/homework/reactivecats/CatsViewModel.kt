@@ -8,10 +8,8 @@ import androidx.lifecycle.ViewModelProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class CatsViewModel(
     catsService: CatsService,
@@ -21,12 +19,27 @@ class CatsViewModel(
 
     private val _catsLiveData = MutableLiveData<Result>()
     val catsLiveData: LiveData<Result> = _catsLiveData
+    private val context = context
+    private val catsService = catsService
+    private val localCatFactsGenerator = localCatFactsGenerator
 
     private val disposables: MutableList<Disposable> = mutableListOf()
 
     init {
+        getFacts()
+    }
+
+    override fun onCleared() {
+        disposables.clear()
+        super.onCleared()
+    }
+
+    private fun getFacts() {
         val disposable = catsService.getCatFact()
             .subscribeOn(Schedulers.io())
+            .onErrorResumeNext(localCatFactsGenerator.generateCatFact())
+            .delay(2000L, TimeUnit.MILLISECONDS)
+            .repeat()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { fact ->
@@ -42,14 +55,8 @@ class CatsViewModel(
                 }
             )
         disposables.add(disposable)
-    }
 
-    override fun onCleared() {
-        disposables.clear()
-        super.onCleared()
     }
-
-    fun getFacts() {}
 }
 
 class CatsViewModelFactory(
