@@ -36,7 +36,8 @@ class CatsViewModel(
                     if (throwable is IOException) {
                         _catsLiveData.value = ServerError
                     } else {
-                        _catsLiveData.value = Error(throwable.message ?: context.getString(R.string.default_error_text))
+                        _catsLiveData.value = Error(throwable.message
+                            ?: context.getString(R.string.default_error_text))
                     }
                 }
             )
