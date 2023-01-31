@@ -8,7 +8,7 @@ import kotlin.random.Random
 import kotlin.random.nextInt
 
 class LocalCatFactsGenerator(
-    private val context: Context
+    private val resourceRepository: ContextResourceRepository
 ) {
 
     /**
@@ -18,7 +18,7 @@ class LocalCatFactsGenerator(
      */
     fun generateCatFact(): Single<Fact> {
         return Single.fromCallable {
-            val array = context.resources.getStringArray(R.array.local_cat_facts)
+            val array = resourceRepository.getStringArray(R.array.local_cat_facts)
             val text = array[Random.nextInt(array.size)]
             Fact(text)
         }
@@ -30,7 +30,7 @@ class LocalCatFactsGenerator(
      * Если вновь заэмиченный Fact совпадает с предыдущим - пропускаем элемент.
      */
     fun generateCatFactPeriodically(): Flowable<Fact> {
-        val success = Fact(context.resources.getStringArray(R.array.local_cat_facts)[Random.nextInt(5)])
+        val success = Fact(resourceRepository.getStringArray(R.array.local_cat_facts)[Random.nextInt(5)])
         return Flowable.fromCallable { getRandomFact() }
             .delay(2000, TimeUnit.MILLISECONDS)
             .repeat()
@@ -38,7 +38,7 @@ class LocalCatFactsGenerator(
     }
 
     private fun getRandomFact() : Fact {
-        val array = context.resources.getStringArray(R.array.local_cat_facts)
+        val array = resourceRepository.getStringArray(R.array.local_cat_facts)
         val text = array[Random.nextInt(array.size)]
         return Fact(text)
     }

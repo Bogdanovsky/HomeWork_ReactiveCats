@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit
 class CatsViewModel(
     catsService: CatsService,
     localCatFactsGenerator: LocalCatFactsGenerator,
-    context: Context
+    resourceRepository: ContextResourceRepository
 ) : ViewModel() {
 
     private val _catsLiveData = MutableLiveData<Result>()
     val catsLiveData: LiveData<Result> = _catsLiveData
-    private val context = context
+    private val resourceRepository = resourceRepository
     private val catsService = catsService
     private val localCatFactsGenerator = localCatFactsGenerator
 
@@ -50,7 +50,7 @@ class CatsViewModel(
                         _catsLiveData.value = ServerError
                     } else {
                         _catsLiveData.value = Error(throwable.message
-                            ?: context.getString(R.string.default_error_text))
+                            ?: resourceRepository.getString(R.string.default_error_text))
                     }
                 }
             )
@@ -62,12 +62,12 @@ class CatsViewModel(
 class CatsViewModelFactory(
     private val catsRepository: CatsService,
     private val localCatFactsGenerator: LocalCatFactsGenerator,
-    private val context: Context
+    private val resourceRepository: ContextResourceRepository
 ) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        CatsViewModel(catsRepository, localCatFactsGenerator, context) as T
+        CatsViewModel(catsRepository, localCatFactsGenerator, resourceRepository) as T
 }
 
 sealed class Result

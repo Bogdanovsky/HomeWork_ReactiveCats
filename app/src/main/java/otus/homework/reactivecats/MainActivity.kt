@@ -11,10 +11,11 @@ class MainActivity : AppCompatActivity() {
 
     private val diContainer = DiContainer()
     private val catsViewModel by viewModels<CatsViewModel> {
+         val resourceRepository = ContextResourceRepository(applicationContext)
         CatsViewModelFactory(
             diContainer.service,
-            diContainer.localCatFactsGenerator(applicationContext),
-            applicationContext
+            diContainer.localCatFactsGenerator(resourceRepository),
+            resourceRepository
         )
     }
 
